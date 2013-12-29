@@ -1,0 +1,6 @@
+name = Context menutrail
+description = TODO: Description of module
+dependencies[] = context
+package = custom
+core = 7.x
+files[] = tests/context_menutrail.test

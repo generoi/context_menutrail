@@ -1,0 +1,74 @@
+<?php
+
+/**
+ * @file context_menutrail.module
+ */
+
+/**
+ * Implements hook_context_plugins().
+ */
+function context_menutrail_context_plugins() {
+  return array(
+    'menutrail' => array(
+      'handler' => array(
+        'path' => drupal_get_path('module', 'context_menutrail'),
+        'file' => 'context_menutrail.context.inc',
+        'class' => 'context_menutrail_reaction',
+        'parent' => 'context_reaction',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_context_registry().
+ */
+function context_menutrail_context_registry() {
+  return array(
+    'reactions' => array(
+      'menutrail' => array(
+        'title' => t('Menu trail'),
+        'description' => t('Set the active menu trail'),
+        'plugin' => 'menutrail',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements of hook_delivery_callback_alter().
+ * Based on menu_position's and menu_trail_by_path's implementations.
+ */
+function context_menutrail_page_delivery_callback_alter() {
+  if ($plugin = context_get_plugin('reaction', 'menutrail')) {
+    $plugin->execute();
+  }
+}
+
+/**
+ * Implements of hook_context_page_condition().
+ */
+function context_menutrail_context_page_condition() {
+  if ($plugin = context_get_plugin('condition', 'menutrail')) {
+    $plugin->execute();
+  }
+}
+
+/**
+ * Implementation of hook_preprocess_menu_link().
+ *
+ * This allows menus that are not primary/secondary menus to get
+ * the "active" class assigned to them. This assumes they are using
+ * theme('menu_link') for the menu rendering to html.
+ */
+function context_menutrail_preprocess_menu_link(&$variables) {
+  if ($contexts = context_active_contexts()){
+    foreach($contexts as $context){
+      if ((isset($context->reactions['menutrail']))){
+        if ($variables['element']['#href'] == $context->reactions['menutrail']) {
+          $variables['element']['#localized_options']['attributes']['class'][] = "active";
+        }
+      }
+    }
+  }
+}

@@ -9,12 +9,20 @@
  */
 function context_menutrail_context_plugins() {
   return array(
-    'menutrail' => array(
+    'menutrail_menu' => array(
       'handler' => array(
         'path' => drupal_get_path('module', 'context_menutrail'),
-        'file' => 'context_menutrail.context.inc',
-        'class' => 'context_menutrail_reaction',
+        'file' => 'context_menutrail_menu_reaction.inc',
+        'class' => 'context_menutrail_menu_reaction',
         'parent' => 'context_reaction',
+      ),
+    ),
+    'menutrail_breadcrumb' => array(
+      'handler' => array(
+        'path' => drupal_get_path('module', 'context_menutrail'),
+        'file' => 'context_menutrail_breadcrumb_reaction.inc',
+        'class' => 'context_menutrail_breadcrumb_reaction',
+        'parent' => 'context_menutrail_menu_reaction',
       ),
     ),
   );
@@ -26,10 +34,15 @@ function context_menutrail_context_plugins() {
 function context_menutrail_context_registry() {
   return array(
     'reactions' => array(
-      'menutrail' => array(
+      'menutrail_menu' => array(
         'title' => t('Menu trail'),
         'description' => t('Set the active menu trail'),
-        'plugin' => 'menutrail',
+        'plugin' => 'menutrail_menu',
+      ),
+      'menutrail_breadcrumb' => array(
+        'title' => t('Breadcrumb (menu trail)'),
+        'description' => t('Set the breadcrumb'),
+        'plugin' => 'menutrail_breadcrumb',
       ),
     ),
   );
@@ -40,16 +53,10 @@ function context_menutrail_context_registry() {
  * Based on menu_position's and menu_trail_by_path's implementations.
  */
 function context_menutrail_page_delivery_callback_alter() {
-  if ($plugin = context_get_plugin('reaction', 'menutrail')) {
+  if ($plugin = context_get_plugin('reaction', 'menutrail_menu')) {
     $plugin->execute();
   }
-}
-
-/**
- * Implements of hook_context_page_condition().
- */
-function context_menutrail_context_page_condition() {
-  if ($plugin = context_get_plugin('condition', 'menutrail')) {
+  if ($plugin = context_get_plugin('reaction', 'menutrail_breadcrumb')) {
     $plugin->execute();
   }
 }

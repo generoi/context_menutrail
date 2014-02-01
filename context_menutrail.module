@@ -71,9 +71,10 @@ function context_menutrail_page_delivery_callback_alter() {
 function context_menutrail_preprocess_menu_link(&$variables) {
   if ($contexts = context_active_contexts()){
     foreach($contexts as $context){
-      if ((isset($context->reactions['menutrail']))){
-        if ($variables['element']['#href'] == $context->reactions['menutrail']) {
-          $variables['element']['#localized_options']['attributes']['class'][] = "active";
+      if ((isset($context->reactions['menutrail_menu']))){
+        list($menu_name, $path) = explode(':', $context->reactions['menutrail_menu'][0]);
+        if ($variables['element']['#href'] == $path) {
+          $variables['element']['#localized_options']['attributes']['class'][] = 'active';
         }
       }
     }
